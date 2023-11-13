@@ -18,9 +18,6 @@ func main() {
 
 	for i := 0; i < 3; i++ {
 		slice[i] = make([]int, 4)
-		for j := 0; j < 4; j++ {
-			slice[i][j] = 0
-		}
 	}
 
 	for i := 0; i < 3; i++ {

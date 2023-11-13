@@ -17,12 +17,6 @@ func main() {
 
 	for i := 0; i < 3; i++ {
 		for j := 0; j < 4; j++ {
-			arr[i][j] = 0
-		}
-	}
-
-	for i := 0; i < 3; i++ {
-		for j := 0; j < 4; j++ {
 			fmt.Printf("%d ", arr[i][j])
 		}
 		fmt.Println()
