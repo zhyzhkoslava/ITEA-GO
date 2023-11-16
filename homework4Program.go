@@ -51,11 +51,11 @@ func main() {
 
 func printHelp() {
 	fmt.Println("Доступні команди:")
-	fmt.Println("  help   - переглянути список команд")
-	fmt.Println("  list   - переглянути список користувачів")
-	fmt.Println("  add    - створити нового користувача")
-	fmt.Println("  update - оновити дані користувача")
-	fmt.Println("  delete - видалити користувача")
+	fmt.Printf("  %s - переглянути список команд\n", CommandHelp)
+	fmt.Printf("  %s - переглянути список користувачів\n", CommandList)
+	fmt.Printf("  %s - створити нового користувача\n", CommandAdd)
+	fmt.Printf("  %s - оновити дані користувача\n", CommandUpdate)
+	fmt.Printf("  %s - видалити користувача\n", CommandDelete)
 }
 
 func listUsers(db Database) {
@@ -104,13 +104,7 @@ func updateUser(db *Database) {
 	fmt.Print("Введіть ID користувача, якого ви хочете оновити: ")
 	fmt.Scanln(&userID)
 
-	foundIndex := -1
-	for i, user := range db.Users {
-		if user.ID == userID {
-			foundIndex = i
-			break
-		}
-	}
+	foundIndex := findUserIndexByID(*db, userID)
 
 	if foundIndex == -1 {
 		fmt.Println("Користувача з таким ID не знайдено.")
@@ -133,13 +127,7 @@ func deleteUser(db *Database) {
 	fmt.Print("Введіть ID користувача, якого ви хочете видалити: ")
 	fmt.Scanln(&userID)
 
-	foundIndex := -1
-	for i, user := range db.Users {
-		if user.ID == userID {
-			foundIndex = i
-			break
-		}
-	}
+	foundIndex := findUserIndexByID(*db, userID)
 
 	if foundIndex == -1 {
 		fmt.Println("Користувача з таким ID не знайдено.")
@@ -149,4 +137,13 @@ func deleteUser(db *Database) {
 	db.Users = append(db.Users[:foundIndex], db.Users[foundIndex+1:]...)
 
 	fmt.Printf("Користувача з ID %d успішно видалено!\n", userID)
+}
+
+func findUserIndexByID(db Database, userID int) int {
+	for i, user := range db.Users {
+		if user.ID == userID {
+			return i
+		}
+	}
+	return -1
 }

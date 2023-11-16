@@ -10,10 +10,10 @@ func main() {
 	fmt.Printf("myVar: %d\nmyPointer: %d\nmySecondPointer: %d\n\n", myVar, *myPointer, **mySecondPointer)
 	fmt.Printf("myVar: %p\nmyPointer: %p\nmySecondPointer: %p\n\n", &myVar, myPointer, mySecondPointer)
 
-	newValue := 99
-	*myPointer = newValue
+	var newValue int = 99
+	**mySecondPointer = newValue
 
-	fmt.Printf("newValue: %d\nmyPointer: %d\nmySecondPointer: %d\n", myVar, *myPointer, **mySecondPointer)
+	fmt.Printf("newValue: %d\nmyPointer: %d\nmySecondPointer: %d\n", newValue, *myPointer, **mySecondPointer)
 
 	fmt.Println("----------------------------------------------------")
 
