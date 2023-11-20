@@ -4,20 +4,25 @@ import (
 	"fmt"
 )
 
+type Grades struct {
+	Math    int
+	Science int
+	History int
+}
+
 type Student struct {
 	FirstName string
 	LastName  string
-	Grades    map[string]int
+	Grades    Grades
 }
 
-func calculateAverage(grades map[string]int) float64 {
-	total := 0
-	count := 0
+func (s Student) FullName() string {
+	return s.FirstName + " " + s.LastName
+}
 
-	for _, grade := range grades {
-		total += grade
-		count++
-	}
+func calculateAverage(grades Grades) float64 {
+	total := grades.Math + grades.Science + grades.History
+	count := 3
 
 	if count == 0 {
 		return 0.0
@@ -31,28 +36,28 @@ func main() {
 		{
 			FirstName: "Sam",
 			LastName:  "Smith",
-			Grades: map[string]int{
-				"Math":    90,
-				"Science": 85,
-				"History": 78,
+			Grades: Grades{
+				Math:    90,
+				Science: 85,
+				History: 78,
 			},
 		},
 		{
 			FirstName: "Julia",
 			LastName:  "Roberts",
-			Grades: map[string]int{
-				"Math":    95,
-				"Science": 88,
-				"History": 92,
+			Grades: Grades{
+				Math:    95,
+				Science: 88,
+				History: 92,
 			},
 		},
 		{
 			FirstName: "John",
 			LastName:  "Doe",
-			Grades: map[string]int{
-				"Math":    95,
-				"Science": 88,
-				"History": 92,
+			Grades: Grades{
+				Math:    95,
+				Science: 88,
+				History: 92,
 			},
 		},
 	}
@@ -60,6 +65,6 @@ func main() {
 	fmt.Println("Список студентів та середній бал:")
 	for _, student := range students {
 		average := calculateAverage(student.Grades)
-		fmt.Printf("%s %s: Середній бал - %.2f\n", student.FirstName, student.LastName, average)
+		fmt.Printf("%s: Середній бал - %.2f\n", student.FullName(), average)
 	}
 }

@@ -1,11 +1,7 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
-	"os"
-	"strconv"
-	"strings"
 )
 
 type Question struct {
@@ -60,13 +56,13 @@ func NewHardcodedQuestionProvider() *HardcodedQuestionProvider {
 	}
 }
 
-func (q *HardcodedQuestionProvider) GetNextQuestion() *Question {
-	if q.currentIdx >= len(q.questions) {
+func (p *HardcodedQuestionProvider) GetNextQuestion() *Question {
+	if p.currentIdx >= len(p.questions) {
 		return nil
 	}
 
-	question := q.questions[q.currentIdx]
-	q.currentIdx++
+	question := p.questions[p.currentIdx]
+	p.currentIdx++
 	return question
 }
 
@@ -88,12 +84,15 @@ func main() {
 		}
 
 		fmt.Print("Ваша відповідь (введіть номер варіанту): ")
-		reader := bufio.NewReader(os.Stdin)
-		userInput, _ := reader.ReadString('\n')
-		userInput = strings.TrimSpace(userInput)
+		var userChoice int
+		_, err := fmt.Scan(&userChoice)
 
-		userChoice := parseUserChoice(userInput)
-		if userChoice == question.CorrectOptionIndex {
+		if err != nil {
+			fmt.Println("Помилка при зчитуванні відповіді. Спробуйте ще раз.")
+			continue
+		}
+
+		if userChoice == question.CorrectOptionIndex+1 {
 			fmt.Println("Правильно!\n")
 			correctAnswers++
 		} else {
@@ -105,12 +104,4 @@ func main() {
 
 	fmt.Printf("Правильних відповідей: %d\n", correctAnswers)
 	fmt.Printf("Неправильних відповідей: %d\n", incorrectAnswers)
-}
-
-func parseUserChoice(input string) int {
-	userChoice, err := strconv.Atoi(input)
-	if err != nil {
-		return -1
-	}
-	return userChoice - 1
 }
