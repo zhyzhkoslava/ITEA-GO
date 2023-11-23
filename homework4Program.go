@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 )
 
@@ -32,21 +33,39 @@ func main() {
 		var command string
 		fmt.Scanln(&command)
 
-		switch command {
-		case CommandHelp:
-			printHelp()
-		case CommandList:
-			listUsers(db)
-		case CommandAdd:
-			addUser(&db)
-		case CommandUpdate:
-			updateUser(&db)
-		case CommandDelete:
-			deleteUser(&db)
-		default:
-			fmt.Println("Невідома команда. Введіть 'help' для отримання списку команд.")
+		err := processCommand(command, &db)
+		if err != nil {
+			fmt.Printf("Помилка: %s\n", err)
 		}
 	}
+}
+
+func processCommand(command string, db *Database) error {
+	switch command {
+	case CommandHelp:
+		printHelp()
+	case CommandList:
+		listUsers(*db)
+	case CommandAdd:
+		err := addUser(db)
+		if err != nil {
+			return err
+		}
+	case CommandUpdate:
+		err := updateUser(db)
+		if err != nil {
+			return err
+		}
+	case CommandDelete:
+		err := deleteUser(db)
+		if err != nil {
+			return err
+		}
+	default:
+		return errors.New("Невідома команда. Введіть 'help' для отримання списку команд.")
+	}
+
+	return nil
 }
 
 func printHelp() {
@@ -70,8 +89,7 @@ func listUsers(db Database) {
 	}
 }
 
-func addUser(db *Database) {
-
+func addUser(db *Database) error {
 	var id int
 	var name string
 
@@ -80,8 +98,7 @@ func addUser(db *Database) {
 
 	for _, user := range db.Users {
 		if user.ID == id {
-			fmt.Println("Користувач з таким ID вже існує. Введіть унікальний ID.")
-			return
+			return errors.New("Користувач з таким ID вже існує. Введіть унікальний ID.")
 		}
 	}
 
@@ -96,9 +113,10 @@ func addUser(db *Database) {
 	db.Users = append(db.Users, newUser)
 
 	fmt.Printf("Користувач %s успішно доданий!\n", name)
+	return nil
 }
 
-func updateUser(db *Database) {
+func updateUser(db *Database) error {
 	var userID int
 
 	fmt.Print("Введіть ID користувача, якого ви хочете оновити: ")
@@ -107,8 +125,7 @@ func updateUser(db *Database) {
 	foundIndex := findUserIndexByID(*db, userID)
 
 	if foundIndex == -1 {
-		fmt.Println("Користувача з таким ID не знайдено.")
-		return
+		return errors.New("Користувача з таким ID не знайдено.")
 	}
 
 	var newName string
@@ -119,9 +136,10 @@ func updateUser(db *Database) {
 	db.Users[foundIndex].Name = newName
 
 	fmt.Printf("Дані користувача з ID %d успішно оновлені!\n", userID)
+	return nil
 }
 
-func deleteUser(db *Database) {
+func deleteUser(db *Database) error {
 	var userID int
 
 	fmt.Print("Введіть ID користувача, якого ви хочете видалити: ")
@@ -130,13 +148,13 @@ func deleteUser(db *Database) {
 	foundIndex := findUserIndexByID(*db, userID)
 
 	if foundIndex == -1 {
-		fmt.Println("Користувача з таким ID не знайдено.")
-		return
+		return errors.New("Користувача з таким ID не знайдено.")
 	}
 
 	db.Users = append(db.Users[:foundIndex], db.Users[foundIndex+1:]...)
 
 	fmt.Printf("Користувача з ID %d успішно видалено!\n", userID)
+	return nil
 }
 
 func findUserIndexByID(db Database, userID int) int {
