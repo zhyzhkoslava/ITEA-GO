@@ -31,7 +31,10 @@ func main() {
 	for {
 		fmt.Print("\nВведіть команду: ")
 		var command string
-		fmt.Scanln(&command)
+		if _, err := fmt.Scanln(&command); err != nil {
+			fmt.Printf("Помилка введення команди: %s\n", err)
+			continue
+		}
 
 		err := processCommand(command, &db)
 		if err != nil {
@@ -94,7 +97,10 @@ func addUser(db *Database) error {
 	var name string
 
 	fmt.Print("Введіть id нового користувача: ")
-	fmt.Scanln(&id)
+	_, err := fmt.Scanln(&id)
+	if err != nil {
+		return fmt.Errorf("Помилка введення id: %s", err)
+	}
 
 	for _, user := range db.Users {
 		if user.ID == id {
@@ -103,7 +109,10 @@ func addUser(db *Database) error {
 	}
 
 	fmt.Print("Введіть ім'я нового користувача: ")
-	fmt.Scanln(&name)
+	_, err = fmt.Scanln(&name)
+	if err != nil {
+		return fmt.Errorf("Помилка введення імені: %s", err)
+	}
 
 	newUser := User{
 		ID:   id,
@@ -120,7 +129,10 @@ func updateUser(db *Database) error {
 	var userID int
 
 	fmt.Print("Введіть ID користувача, якого ви хочете оновити: ")
-	fmt.Scanln(&userID)
+	_, err := fmt.Scanln(&userID)
+	if err != nil {
+		return fmt.Errorf("Помилка введення ID: %s", err)
+	}
 
 	foundIndex := findUserIndexByID(*db, userID)
 
@@ -131,7 +143,10 @@ func updateUser(db *Database) error {
 	var newName string
 
 	fmt.Print("Введіть нове ім'я користувача: ")
-	fmt.Scanln(&newName)
+	_, err = fmt.Scanln(&newName)
+	if err != nil {
+		return fmt.Errorf("Помилка введення нового імені: %s", err)
+	}
 
 	db.Users[foundIndex].Name = newName
 
@@ -143,7 +158,10 @@ func deleteUser(db *Database) error {
 	var userID int
 
 	fmt.Print("Введіть ID користувача, якого ви хочете видалити: ")
-	fmt.Scanln(&userID)
+	_, err := fmt.Scanln(&userID)
+	if err != nil {
+		return fmt.Errorf("Помилка введення ID: %s", err)
+	}
 
 	foundIndex := findUserIndexByID(*db, userID)
 
