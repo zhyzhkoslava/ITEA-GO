@@ -1,4 +1,4 @@
-package questions
+package model
 
 type Question struct {
 	Text               string

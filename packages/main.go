@@ -3,7 +3,8 @@ package main
 import (
 	"context"
 	"fmt"
-	"packages/questionproviders"
+
+	"github.com/zhyzhkoslava/ITEA-GO/questionproviders"
 
 	"github.com/jackc/pgx/v5"
 )
@@ -26,8 +27,7 @@ func main() {
 
 	questions, err := questionsProvider.GetAllQuestions()
 	if err != nil {
-		fmt.Println("Error:", err)
-		return
+		panic(err)
 	}
 
 	for _, question := range questions {
