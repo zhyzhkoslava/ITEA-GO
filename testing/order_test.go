@@ -1,7 +1,6 @@
 package testing
 
 import (
-	"errors"
 	"testing"
 	"time"
 )
@@ -32,13 +31,9 @@ func TestOrderAlreadyProcess(t *testing.T) {
 	actualErr := order.Process()
 	t.Log("Actual Error:", actualErr)
 
-	// expectedErr := "Cannot process order. Invalid status."
-	// if actualErr.Error() != expectedErr {
-	// 	t.Errorf("Expected error processing an already processing order, got %v", actualErr)
-	// }
-	expectedErr := errors.New("Cannot process order. Invalid status.")
-	if !errors.Is(err, expectedErr) {
-		t.Errorf("Expected error processing an already processing order, got %v", err)
+	expectedErr := "Cannot process order. Invalid status."
+	if actualErr.Error() != expectedErr {
+		t.Errorf("Expected error processing an already processing order, got %v", actualErr)
 	}
 }
 
