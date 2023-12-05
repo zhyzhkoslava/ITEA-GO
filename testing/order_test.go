@@ -1,7 +1,7 @@
 package testing
 
 import (
-	"fmt"
+	"errors"
 	"testing"
 	"time"
 )
@@ -29,13 +29,16 @@ func TestOrderAlreadyProcess(t *testing.T) {
 		t.Errorf("Unexpected error processing order: %s", err)
 	}
 
-	err = order.Process()
+	actualErr := order.Process()
+	t.Log("Actual Error:", actualErr)
 
-	fmt.Println("Actual Error:", err)
-
-	expectedErrMsg := "Cannot process order. Invalid status."
-	if err == nil || err.Error() != expectedErrMsg {
-		t.Errorf("Expected error processing an already processing order with message '%s', got %v", expectedErrMsg, err)
+	// expectedErr := "Cannot process order. Invalid status."
+	// if actualErr.Error() != expectedErr {
+	// 	t.Errorf("Expected error processing an already processing order, got %v", actualErr)
+	// }
+	expectedErr := errors.New("Cannot process order. Invalid status.")
+	if !errors.Is(err, expectedErr) {
+		t.Errorf("Expected error processing an already processing order, got %v", err)
 	}
 }
 
