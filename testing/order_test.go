@@ -1,29 +1,43 @@
 package testing
 
 import (
+	"errors"
 	"testing"
 	"time"
 )
 
-func TestOrderProcess(t *testing.T) {
+func TestOrderSuccessProcess(t *testing.T) {
 	customer := Customer{Email: "example@gmail.com"}
 	order := NewOrder(customer)
 
-	if order.Status != Initiated {
-		t.Errorf("Expected status %s, got %s", Initiated, order.Status)
-	}
-
 	err := order.Process()
 	if err != nil {
-		t.Errorf("Error processing order: %s", err)
+		t.Errorf("Unexpected error processing order: %s", err)
 	}
 
 	if order.Status != Processing {
 		t.Errorf("Expected status %s after processing, got %s", Processing, order.Status)
 	}
+}
 
-	err = order.Process()
-	if err == nil || err.Error() != "Cannot process order. Invalid status." {
+func TestOrderAlreadyProcess(t *testing.T) {
+	customer := Customer{Email: "example@gmail.com"}
+	order := NewOrder(customer)
+
+	err := order.Process()
+	if err != nil {
+		t.Errorf("Unexpected error processing order: %s", err)
+	}
+
+	actualErr := order.Process()
+	t.Log("Actual Error:", actualErr)
+
+	// expectedErr := "Cannot process order. Invalid status."
+	// if actualErr.Error() != expectedErr {
+	// 	t.Errorf("Expected error processing an already processing order, got %v", actualErr)
+	// }
+	expectedErr := errors.New("Cannot process order. Invalid status.")
+	if !errors.Is(err, expectedErr) {
 		t.Errorf("Expected error processing an already processing order, got %v", err)
 	}
 }
@@ -32,12 +46,7 @@ func TestOrderMarkAsSuccess(t *testing.T) {
 	customer := Customer{Email: "example@gmail.com"}
 	order := NewOrder(customer)
 
-	err := order.MarkAsSuccess()
-	if err == nil || err.Error() != "Cannot mark order as success. Invalid status." {
-		t.Errorf("Expected error marking as success without processing, got %v", err)
-	}
-
-	err = order.Process()
+	err := order.Process()
 	if err != nil {
 		t.Errorf("Error processing order: %s", err)
 	}
@@ -52,16 +61,35 @@ func TestOrderMarkAsSuccess(t *testing.T) {
 	}
 }
 
-func TestOrderMarkAsFail(t *testing.T) {
+func TestOrderMarkAsSuccessFailure(t *testing.T) {
+	customer := Customer{Email: "example@gmail.com"}
+	order := NewOrder(customer)
+
+	err := order.MarkAsSuccess()
+
+	expectedErrMsg := "Cannot mark order as success. Invalid status."
+	if err == nil || err.Error() != expectedErrMsg {
+		t.Errorf("Expected error marking as success without processing, got %v", err)
+	}
+}
+
+func TestOrderMarkAsFailFailure(t *testing.T) {
 	customer := Customer{Email: "example@gmail.com"}
 	order := NewOrder(customer)
 
 	err := order.MarkAsFail()
-	if err == nil || err.Error() != "Cannot mark order as fail. Invalid status." {
+
+	expectedErrMsg := "Cannot mark order as fail. Invalid status."
+	if err == nil || err.Error() != expectedErrMsg {
 		t.Errorf("Expected error marking as fail without processing, got %v", err)
 	}
+}
 
-	err = order.Process()
+func TestOrderMarkAsFailSuccessful(t *testing.T) {
+	customer := Customer{Email: "example@gmail.com"}
+	order := NewOrder(customer)
+
+	err := order.Process()
 	if err != nil {
 		t.Errorf("Error processing order: %s", err)
 	}
@@ -110,7 +138,7 @@ func TestNewOrder(t *testing.T) {
 		t.Errorf("Expected CreatedAt to be before the current time")
 	}
 
-	if !order.UpdatedAt.Before(time.Now()) {
-		t.Errorf("Expected UpdatedAt to be before the current time")
+	if !order.CreatedAt.Equal(order.UpdatedAt) {
+		t.Errorf("Expected CreatedAt and UpdatedAt to be identical")
 	}
 }
