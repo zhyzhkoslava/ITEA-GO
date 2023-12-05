@@ -8,7 +8,6 @@ import (
 )
 
 func main() {
-
 	jsonData, err := os.ReadFile("homework9/questions.json")
 	if err != nil {
 		panic(err)
