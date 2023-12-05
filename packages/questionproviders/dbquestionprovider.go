@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/jackc/pgx/v5"
-	"github.com/zhyzhkoslava/ITEA-GO/model"
+	"github.com/zhyzhkoslava/ITEA-GO/packages/model"
 )
 
 type DBQuestionProvider struct {

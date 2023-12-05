@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/zhyzhkoslava/ITEA-GO/questionproviders"
+	"github.com/zhyzhkoslava/ITEA-GO/packages/questionproviders"
 
 	"github.com/jackc/pgx/v5"
 )
