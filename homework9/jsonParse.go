@@ -5,6 +5,8 @@ import (
 	"fmt"
 )
 
+const refundTransactionType = "refund"
+
 type Order struct {
 	ID           string `json:"id"`
 	Amount       int    `json:"amount"`
@@ -14,7 +16,7 @@ type Order struct {
 	} `json:"transactions"`
 }
 
-func main() {
+func json_main() {
 	jsonData := `
 		[
 			{"id": "f9c81316-0bad-4f7c-93df-dd441c5371f2", "amount": 1099, "transactions": [{"id": "43c2f68e-85aa-4e1f-a22c-7e42d27a560a", "type": "auth"}, {"id": "2025c1f3-a97a-4f0d-bc2c-dcbcea63930a", "type": "settle"}]},
@@ -31,7 +33,7 @@ func main() {
 
 	for _, order := range orders {
 		for _, transaction := range order.Transactions {
-			if transaction.Type == "refund" {
+			if transaction.Type == refundTransactionType {
 
 				fmt.Printf("ID ордера з транзакцією 'refund': %s\n", order.ID)
 				break

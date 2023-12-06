@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/zhyzhkoslava/ITEA-GO/homework9/dto"
@@ -28,8 +27,6 @@ func printUserInfo(username string) error {
 	if resp.StatusCode == http.StatusNotFound {
 		fmt.Println("User not found.")
 		return nil
-	} else if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("Unexpected status code: %d", resp.StatusCode)
 	}
 
 	bodyBytes, err := io.ReadAll(resp.Body)
@@ -42,8 +39,7 @@ func printUserInfo(username string) error {
 		return err
 	}
 
-	fmt.Printf("ID:\t%d\nName:\t%s\nBio:\t%s\nCreation Year:\t%s\n", user.Id, user.Name, user.Bio, user.CreatedAt)
-	os.Exit(0)
+	fmt.Printf("Creation Year:\t%s\n", user.CreatedAt)
 	return nil
 }
 
@@ -61,5 +57,6 @@ func main() {
 		if err != nil {
 			fmt.Printf("Помилка: %s\n", err)
 		}
+		return
 	}
 }

@@ -7,15 +7,19 @@ import (
 	"github.com/zhyzhkoslava/ITEA-GO/packages/questionproviders"
 )
 
+const questionsFile = "homework9/questions.json"
+
 func main() {
-	jsonData, err := os.ReadFile("homework9/questions.json")
+	jsonData, err := os.ReadFile(questionsFile)
 	if err != nil {
-		panic(err)
+		fmt.Printf("Error reading file %s: %v\n", questionsFile, err)
+		return
 	}
 
 	jsonQuestionsProvider, err := questionproviders.NewJSONQuestionProvider(jsonData)
 	if err != nil {
-		panic(err)
+		fmt.Printf("Error creating JSON question provider: %v\n", err)
+		return
 	}
 
 	questionsProvider := jsonQuestionsProvider
