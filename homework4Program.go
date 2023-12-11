@@ -22,7 +22,7 @@ const (
 	CommandDelete = "delete"
 )
 
-func main() {
+func program_main() {
 	db := Database{}
 
 	fmt.Println("Ласкаво просимо до консольної програми - бази даних користувачів!")
