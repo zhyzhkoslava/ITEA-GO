@@ -1,47 +1,76 @@
 package main
 
 import (
-	"encoding/json"
+	"bufio"
 	"fmt"
-	"log"
 	"os"
-
-	"github.com/zhyzhkoslava/ITEA-GO/hw10/handler"
-	"github.com/zhyzhkoslava/ITEA-GO/hw10/middleware"
-	"github.com/zhyzhkoslava/ITEA-GO/hw10/server"
-	"github.com/zhyzhkoslava/ITEA-GO/hw10/structure"
+	"sync"
 )
 
-const UsersFile = "hw10/users.json"
+func readFile(filePath string, linesCh chan []string, wg *sync.WaitGroup) {
+	defer wg.Done()
+
+	file, err := os.Open(filePath)
+	if err != nil {
+		fmt.Println("Error opening file:", err)
+		return
+	}
+	defer file.Close()
+
+	var lines []string
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		lines = append(lines, scanner.Text())
+	}
+
+	if err := scanner.Err(); err != nil {
+		fmt.Println("Error reading file:", err)
+		return
+	}
+
+	linesCh <- lines
+}
+
+func writeFile(outputFilePath string, linesCh chan []string, doneCh chan struct{}, wg *sync.WaitGroup) {
+	defer wg.Done()
+
+	outputFile, err := os.OpenFile(outputFilePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		fmt.Println("Error opening output file:", err)
+		return
+	}
+	defer outputFile.Close()
+
+	for lines := range linesCh {
+		for _, line := range lines {
+			_, err := fmt.Fprintln(outputFile, line)
+			if err != nil {
+				fmt.Println("Error writing to output file:", err)
+				return
+			}
+		}
+	}
+}
 
 func main() {
+	file1Path := "hw11/file1.txt"
+	file2Path := "hw11/file2.txt"
+	outputFilePath := "hw11/res.txt"
 
-	usersData, err := os.ReadFile(UsersFile)
-	if err != nil {
-		fmt.Printf("Error reading file %s: %v\n", UsersFile, err)
-		return
-	}
+	var wg sync.WaitGroup
+	linesCh := make(chan []string, 2)
+	doneCh := make(chan struct{})
 
-	var users []structure.User
-	if err := json.Unmarshal(usersData, &users); err != nil {
-		fmt.Printf("Error unmarshalling JSON: %v\n", err)
-		return
-	}
+	wg.Add(2)
+	go readFile(file1Path, linesCh, &wg)
+	go readFile(file2Path, linesCh, &wg)
 
-	logger := log.Default()
-	token := "secret"
+	wg.Wait()
+	close(linesCh)
 
-	requestLoggerMiddleware := middleware.NewRequestLogger(logger)
-	tokenMiddleware := middleware.NewTokenMiddleware(token)
+	wg.Add(1)
+	go writeFile(outputFilePath, linesCh, doneCh, &wg)
 
-	usersHandler := handler.NewUsersHandler(logger, users)
-	userHandler := handler.NewUserHandler(logger, users, UsersFile)
-
-	apiServer := server.NewAPIServer(logger)
-	apiServer.AddRoute("/users", requestLoggerMiddleware.Wrap(tokenMiddleware.Wrap(usersHandler)))
-	apiServer.AddRoute("/user/", requestLoggerMiddleware.Wrap(tokenMiddleware.Wrap(userHandler)))
-
-	if err := apiServer.Start(); err != nil {
-		logger.Fatal(err)
-	}
+	wg.Wait()
+	close(doneCh)
 }
